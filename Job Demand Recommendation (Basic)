@@ -1,0 +1,31 @@
+def generate_job_demand_recommendations(df_exploded, top_n=10):
+    """Generates basic job demand recommendations based on skill frequencies."""
+    if df_exploded.empty or 'Skills' not in df_exploded.columns:
+        print("Insufficient skill data for recommendations.")
+        return
+
+    overall_skill_counts = df_exploded['Skills'].value_counts().nlargest(top_n)
+    print("\n--- Overall Top Skills ---")
+    print(overall_skill_counts)
+    print("\nRecommendations:")
+    print(f"- The top {top_n} overall skills suggest high demand for these abilities across various roles and locations.")
+    print("- Consider focusing on acquiring or highlighting these skills if you are a job seeker.")
+
+    if 'Location' in df_exploded.columns:
+        print("\n--- Top Skills by Location ---")
+        top_skills_by_location = df_exploded.groupby('Location')['Skills'].apply(lambda x: x.value_counts().nlargest(5))
+        print(top_skills_by_location)
+        print("\n- The top skills vary by location, indicating regional differences in job market demands.")
+
+    if 'Title' in df_exploded.columns:
+        print("\n--- Top Skills by Job Title (Example for top 3 titles) ---")
+        top_titles = df_exploded['Title'].value_counts().nlargest(3).index
+        for title in top_titles:
+            print(f"\nTop skills for '{title}':")
+            print(df_exploded[df_exploded['Title'] == title]['Skills'].value_counts().nlargest(5))
+        print("\n- Different job roles emphasize different sets of skills.")
+
+if 'cleaned_df' in locals() and not cleaned_df.empty and 'Skills' in cleaned_df.columns:
+    generate_job_demand_recommendations(cleaned_df)
+else:
+    print("No cleaned and exploded skill data available for generating recommendations.")
