@@ -1,0 +1,32 @@
+python
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def generate_skill_heatmap_by_city(df_exploded, top_n=10):
+    """Generates a heatmap of the top N skills by city."""
+    if df_exploded.empty or 'Location' not in df_exploded.columns or 'Skills' not in df_exploded.columns:
+        print("Insufficient data to generate skill heatmap by city.")
+        return
+
+    skill_counts = df_exploded.groupby(['Location', 'Skills']).size().reset_index(name='Count')
+
+    def get_top_n(group):
+        return group.nlargest(top_n, 'Count')
+
+    top_skills = skill_counts.groupby('Location', group_keys=False).apply(get_top_n)
+
+    pivot_table = top_skills.pivot_table(index='Location', columns='Skills', values='Count', fill_value=0)
+
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(pivot_table, annot=True, cmap='viridis', fmt='d')
+    plt.title(f'Top {top_n} Skills by City')
+    plt.xlabel('Skills')
+    plt.ylabel('City')
+    plt.tight_layout()
+    plt.show()
+
+if 'cleaned_df' in locals() and not cleaned_df.empty and 'Skills' in cleaned_df.columns:
+    generate_skill_heatmap_by_city(cleaned_df)
+else:
+    print("No cleaned and exploded skill data available for heatmap generation.")
+
