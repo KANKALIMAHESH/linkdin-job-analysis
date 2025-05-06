@@ -1,0 +1,17 @@
+def generate_skill_role_matrix(df_exploded):
+    """Generates a skill vs role matrix."""
+    if df_exploded.empty or 'Title' not in df_exploded.columns or 'Skills' not in df_exploded.columns:
+        print("Insufficient data to generate skill vs role matrix.")
+        return None
+
+    skill_role_counts = df_exploded.groupby(['Title', 'Skills']).size().reset_index(name='Count')
+    skill_role_matrix = skill_role_counts.pivot_table(index='Title', columns='Skills', values='Count', fill_value=0)
+    return skill_role_matrix
+
+if 'cleaned_df' in locals() and not cleaned_df.empty and 'Skills' in cleaned_df.columns:
+    skill_role_matrix_df = generate_skill_role_matrix(cleaned_df)
+    if skill_role_matrix_df is not None:
+        print("\nSkill vs Role Matrix (first 5 rows and columns):")
+        print(skill_role_matrix_df.head().iloc[:, :5]) # Display first 5 cols for brevity
+else:
+    print("No cleaned and exploded skill data available for skill vs role matrix generation.")
