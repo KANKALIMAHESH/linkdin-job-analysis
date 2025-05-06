@@ -1,0 +1,25 @@
+
+python
+def clean_job_data(df):
+    """Cleans the job data."""
+    if df.empty:
+        return df
+    df['Title'] = df['Title'].str.strip().str.lower() if 'Title' in df.columns else None
+    df['Location'] = df['Location'].str.strip().str.lower() if 'Location' in df.columns else None
+    if 'Skills' in df.columns:
+        df['Skills'] = df['Skills'].apply(lambda skills_list: [skill.strip().lower() for skill in skills_list])
+        # Explode the list of skills into separate rows for easier counting
+        df_exploded = df.explode('Skills')
+        return df_exploded
+    return df
+
+if 'combined_df' in locals() and not combined_df.empty:
+    cleaned_df = clean_job_data(combined_df.copy())
+    print("\nCleaned Data (first 5 rows if skills were extracted and exploded):")
+    if 'Skills' in cleaned_df.columns:
+        print(cleaned_df.head())
+    else:
+        print(cleaned_df.head())
+else:
+    print("No data to clean.")
+
